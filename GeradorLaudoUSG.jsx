@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { saveAs } from 'file-saver';
 import html2pdf from 'html2pdf.js';
 import { Document, Packer, Paragraph } from 'docx';
+import { format } from 'date-fns';
 
 export default function GeradorLaudoUSG() {
   const [tipoExame, setTipoExame] = useState("Abdome Total");
@@ -9,6 +10,7 @@ export default function GeradorLaudoUSG() {
   const [idadePaciente, setIdadePaciente] = useState("");
   const [laudo, setLaudo] = useState("");
   const [imagens, setImagens] = useState([]);
+  const dataAtual = format(new Date(), "dd-MM-yyyy");
 
   const estruturas = {
     "Abdome Total": ["Fígado", "Vesícula Biliar", "Pâncreas", "Baço", "Rins", "Bexiga"],
@@ -19,7 +21,7 @@ export default function GeradorLaudoUSG() {
 
   const gerarLaudo = () => {
     let texto = `\nLAUDO DE ULTRASSONOGRAFIA - ${tipoExame.toUpperCase()}\n\n`;
-    texto += `Paciente: ${nomePaciente}\nIdade: ${idadePaciente}\n\n`;
+    texto += `Paciente: ${nomePaciente}\nIdade: ${idadePaciente}\nData: ${dataAtual}\n\n`;
     estruturas[tipoExame].forEach(orgao => {
       texto += `**${orgao}**: descrição normal.\n`;
     });
@@ -31,18 +33,18 @@ export default function GeradorLaudoUSG() {
 
   const salvarPDF = () => {
     const element = document.getElementById("laudoArea");
-const filename = `${nomePaciente.replace(/\s+/g, '_')}_${dataAtual}.pdf`;
-html2pdf().from(element).set({ filename }).save();
+    const nomeArquivo = `${nomePaciente.replace(/\s+/g, '_')}_${dataAtual}.pdf`;
+    html2pdf().from(element).set({ filename: nomeArquivo }).save();
   };
 
   const salvarDOCX = () => {
     const doc = new Document({
       sections: [{
-        children: laudo.split('\n').map(line => new Paragraph(line))
+        children: laudo.split('\n').map(linha => new Paragraph(linha))
       }]
     });
-    const filename = `${nomePaciente.replace(/\s+/g, '_')}_${dataAtual}.docx`;
-Packer.toBlob(doc).then(blob => saveAs(blob, filename));
+    const nomeArquivo = `${nomePaciente.replace(/\s+/g, '_')}_${dataAtual}.docx`;
+    Packer.toBlob(doc).then(blob => saveAs(blob, nomeArquivo));
   };
 
   const handleUpload = (e) => {
@@ -76,9 +78,12 @@ Packer.toBlob(doc).then(blob => saveAs(blob, filename));
 
       <button onClick={gerarLaudo} className="bg-blue-600 text-white px-4 py-2 rounded mb-4">Gerar Laudo</button>
 
-      <textarea id="laudoArea" className="whitespace-pre-wrap border p-4 bg-white w-full h-96" value={laudo} onChange={e => setLaudo(e.target.value)} />
-        {laudo}
-      </div>
+      <textarea
+        id="laudoArea"
+        className="whitespace-pre-wrap border p-4 bg-white w-full h-96"
+        value={laudo}
+        onChange={e => setLaudo(e.target.value)}
+      />
 
       <div className="flex gap-2 my-4">
         <button onClick={imprimir} className="bg-gray-700 text-white px-4 py-2 rounded">Imprimir</button>
@@ -92,7 +97,7 @@ Packer.toBlob(doc).then(blob => saveAs(blob, filename));
       </div>
 
       {imagens.length > 0 && (
-        <div className="grid grid-cols-3 gap-2">
+        <div className="grid grid-cols-2 gap-2">
           {imagens.map((src, i) => (
             <img key={i} src={src} alt={`Imagem ${i + 1}`} className="border" />
           ))}
