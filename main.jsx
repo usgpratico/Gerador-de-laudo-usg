@@ -1,6 +1,1 @@
-import React from 'react';
-import ReactDOM from 'react-dom/client';
-import './index.css';
-import GeradorLaudoUSG from './GeradorLaudoUSG';
-
-ReactDOM.createRoot(document.getElementById('root')).render(<GeradorLaudoUSG />);
+import React from 'react'; import ReactDOM from 'react-dom/client'; import './index.css'; import GeradorLaudoUSG from './GeradorLaudoUSG'; ReactDOM.createRoot(document.getElementById('root')).render(<GeradorLaudoUSG />);

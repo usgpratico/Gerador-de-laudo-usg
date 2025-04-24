@@ -30,7 +30,9 @@ export default function GeradorLaudoUSG() {
   const imprimir = () => window.print();
 
   const salvarPDF = () => {
-    html2pdf().from(document.getElementById("laudoArea")).save("laudo.pdf");
+    const element = document.getElementById("laudoArea");
+const filename = `${nomePaciente.replace(/\s+/g, '_')}_${dataAtual}.pdf`;
+html2pdf().from(element).set({ filename }).save();
   };
 
   const salvarDOCX = () => {
@@ -39,7 +41,8 @@ export default function GeradorLaudoUSG() {
         children: laudo.split('\n').map(line => new Paragraph(line))
       }]
     });
-    Packer.toBlob(doc).then(blob => saveAs(blob, "laudo.docx"));
+    const filename = `${nomePaciente.replace(/\s+/g, '_')}_${dataAtual}.docx`;
+Packer.toBlob(doc).then(blob => saveAs(blob, filename));
   };
 
   const handleUpload = (e) => {
@@ -73,7 +76,7 @@ export default function GeradorLaudoUSG() {
 
       <button onClick={gerarLaudo} className="bg-blue-600 text-white px-4 py-2 rounded mb-4">Gerar Laudo</button>
 
-      <div id="laudoArea" className="whitespace-pre-wrap border p-4 bg-white">
+      <textarea id="laudoArea" className="whitespace-pre-wrap border p-4 bg-white w-full h-96" value={laudo} onChange={e => setLaudo(e.target.value)} />
         {laudo}
       </div>
 
